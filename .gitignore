@@ -1,0 +1,17 @@
+# Bỏ qua tất cả node_modules
+node_modules/
+
+# Bỏ .env nếu có
+.env
+.env.local
+.env.development
+.env.production
+
+# Log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output (tuỳ dự án)
+dist/
+build/
