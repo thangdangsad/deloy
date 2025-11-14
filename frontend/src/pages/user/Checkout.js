@@ -42,7 +42,7 @@ import AddressCard from "../../components/checkout/AddressCard";
 import * as api from "../../api";
 
 const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+  process.env.REACT_APP_API_BASE_URL || "https://deloy-4.onrender.com";
 
 const normalizeImg = (url) => {
   if (!url) return "";
