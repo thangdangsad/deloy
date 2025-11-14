@@ -1,49 +1,35 @@
 {
   "development": {
     "username": "admin",
-    "password": "yyjMwBB0uViQVD9kLIaeKYQ0BFmZQutr",
-    "database": "shoestoredb1411",
-    "host": "dpg-d4bdtbvdiees73agsor0-a.singapore-postgres.render.com",
-    "port": 5432,
-    "dialect": "postgres",
+    "password": "Qa12345678",
+    "database": "ShoeStoreDB1411",
+    "host": "mssql-204595-0.cloudclusters.net",
+    "port": "10078",
+    "dialect": "mssql",
     "dialectOptions": {
-      "ssl": {
-        "require": true,
-        "rejectUnauthorized": false
+      "options": {
+        "encrypt": true,
+        "trustServerCertificate": true
       }
     },
     "pool": {
       "max": 10,
       "min": 0,
-      "idle": 30000
+      "idleTimeoutMillis": 30000
     }
   },
   "test": {
     "username": "admin",
-    "password": "yyjMwBB0uViQVD9kLIaeKYQ0BFmZQutr",
-    "database": "shoestoredb1411",
-    "host": "dpg-d4bdtbvdiees73agsor0-a.singapore-postgres.render.com",
-    "port": 5432,
-    "dialect": "postgres",
-    "dialectOptions": {
-      "ssl": {
-        "require": true,
-        "rejectUnauthorized": false
-      }
-    }
+    "password": "Qa12345678",
+    "database": "ShoeStoreDB1411",
+    "host": "mssql-204595-0.cloudclusters.net",
+    "dialect": "mssql"
   },
   "production": {
     "username": "admin",
-    "password": "yyjMwBB0uViQVD9kLIaeKYQ0BFmZQutr",
-    "database": "shoestoredb1411",
-    "host": "dpg-d4bdtbvdiees73agsor0-a.singapore-postgres.render.com",
-    "port": 5432,
-    "dialect": "postgres",
-    "dialectOptions": {
-      "ssl": {
-        "require": true,
-        "rejectUnauthorized": false
-      }
-    }
+    "password": "Qa12345678",
+    "database": "ShoeStoreDB1411",
+    "host": "mssql-204595-0.cloudclusters.net",
+    "dialect": "mssql"
   }
 }
