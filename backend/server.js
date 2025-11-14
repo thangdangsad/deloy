@@ -23,7 +23,7 @@ const app = express();
 
 /* ---------------- CORS & Middlewares cơ bản ---------------- */
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: true,
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-ID'],
   exposedHeaders: ['X-Session-ID'],
