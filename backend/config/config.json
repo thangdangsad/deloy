@@ -24,7 +24,18 @@
     "database": "ShoeStoreDB1411",
     "host": "mssql-204595-0.cloudclusters.net",
     "port": "10078",
-    "dialect": "mssql"
+    "dialect": "mssql",
+    "dialectOptions": {
+      "options": {
+        "encrypt": true,
+        "trustServerCertificate": true
+      }
+    },
+    "pool": {
+      "max": 10,
+      "min": 0,
+      "idleTimeoutMillis": 30000
+    }
   },
   "production": {
     "username": "admin",
@@ -32,6 +43,17 @@
     "database": "ShoeStoreDB1411",
     "host": "mssql-204595-0.cloudclusters.net",
     "port": "10078",
-    "dialect": "mssql"
+    "dialect": "mssql",
+    "dialectOptions": {
+      "options": {
+        "encrypt": true,
+        "trustServerCertificate": true
+      }
+    },
+    "pool": {
+      "max": 10,
+      "min": 0,
+      "idleTimeoutMillis": 30000
+    }
   }
 }
