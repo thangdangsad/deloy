@@ -24,7 +24,13 @@
     "password": "Qa12345678",
     "database": "ShoeStoreDB1411",
     "host": "mssql-204595-0.cloudclusters.net",
-    "port": "10078"
+    "port": "10078",
+    "dialectOptions": {
+      "options": {
+        "encrypt": true,
+        "trustServerCertificate": true
+      }
+  }
   },
   "production": {
     "dialect": "mssql",
@@ -32,6 +38,12 @@
     "password": "Qa12345678",
     "database": "ShoeStoreDB1411",
     "host": "mssql-204595-0.cloudclusters.net",
-    "port": "10078"
+    "port": "10078",
+    "dialectOptions": {
+      "options": {
+        "encrypt": true,
+        "trustServerCertificate": true
+      }
+    }
   }
 }
