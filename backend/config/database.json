@@ -1,34 +1,49 @@
 {
   "development": {
-    "dialect": "mssql",
-    "host": "localhost",
-    "username": "sa",
-    "password": "123456789",
-    "database": "ShoeStoreDB1411",
+    "dialect": "postgres",
+    "host": "dpg-d4bdtbvdiees73agsor0-a.singapore-postgres.render.com",
+    "username": "admin",
+    "password": "yyjMwBB0uViQVD9kLIaeKYQ0BFmZQutr",
+    "database": "shoestoredb1411",
+    "port": 5432,
     "dialectOptions": {
-      "options": {
-        "encrypt": false,
-        "trustServerCertificate": true
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
       }
     },
     "pool": {
       "max": 10,
       "min": 0,
-      "idleTimeoutMillis": 30000
+      "idle": 30000
     }
   },
   "test": {
-    "dialect": "mssql",
-    "host": "localhost",
-    "username": "sa",
-    "password": "12356789",
-    "database": "ShoeStoreDB1610_test"
+    "dialect": "postgres",
+    "host": "dpg-d4bdtbvdiees73agsor0-a.singapore-postgres.render.com",
+    "username": "admin",
+    "password": "yyjMwBB0uViQVD9kLIaeKYQ0BFmZQutr",
+    "database": "shoestoredb1411",
+    "port": 5432,
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   },
   "production": {
-    "dialect": "mssql",
-    "host": "localhost",
-    "username": "sa",
-    "password": "12356789",
-    "database": "ShoeStoreDB1610"
+    "dialect": "postgres",
+    "host": "dpg-d4bdtbvdiees73agsor0-a.singapore-postgres.render.com",
+    "username": "admin",
+    "password": "yyjMwBB0uViQVD9kLIaeKYQ0BFmZQutr",
+    "database": "shoestoredb1411",
+    "port": 5432,
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   }
 }
