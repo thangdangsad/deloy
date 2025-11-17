@@ -50,7 +50,11 @@ const createGuestOrderSchema = Joi.object({
     
     // === SỬA LỖI: THÊM 2 TRƯỜNG MÀ FRONTEND GỬI LÊN ===
     source: Joi.string().optional().allow(null, ''),
-    sessionId: Joi.string().optional().allow(null, '')
+    sessionId: Joi.string().optional().allow(null, ''),
+    
+    // === THÊM TRƯỜNG GHN ===
+    wardCode: Joi.string().optional().allow(null, ''),
+    districtId: Joi.number().integer().optional().allow(null)
 });
 
 

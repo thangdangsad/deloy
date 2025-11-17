@@ -3,11 +3,11 @@ const db = require('../models');
 const { Sequelize, Op } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
-
+   
 // =======================================================
 // ===               CONTROLLERS CHO USER              ===
 // =======================================================
-/**
+/** 
  * @route   GET /api/blogs
  * @desc    Lấy danh sách các bài blog (đang hoạt động) có phân trang, tìm kiếm, sắp xếp
  * @access  Public

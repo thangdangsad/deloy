@@ -38,11 +38,11 @@ import { clearCartLocal } from "../../redux/cartSlice";
 import { selectUser } from "../../redux/userSlice";
 import { resetVoucherStatus } from "../../redux/profileSlice";
 import AddressCard from "../../components/checkout/AddressCard";
-// import GHNAddressSelector from "../../components/user/GHNAddressSelector";
+import GHNAddressSelector from "../../components/user/GHNAddressSelector";
 import * as api from "../../api";
 
 const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "https://deloy-4.onrender.com";
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
 const normalizeImg = (url) => {
   if (!url) return "";
@@ -396,6 +396,11 @@ export default function Checkout() {
     } else {
       const sessionId = localStorage.getItem("guest_session_id");
       Object.assign(orderPayload, guestFormik.values, { sessionId });
+      // Thêm thông tin GHN nếu có
+      if (guestGHNAddress) {
+        orderPayload.wardCode = guestGHNAddress.wardCode;
+        orderPayload.districtId = guestGHNAddress.districtId;
+      }
     }
 
     console.log("FINAL PAYLOAD TO SEND:", orderPayload);
@@ -572,39 +577,18 @@ export default function Checkout() {
                         </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Địa chỉ *</Form.Label>
-                        <Form.Control
-                          name="street"
-                          {...guestFormik.getFieldProps("street")}
-                          isInvalid={
-                            guestFormik.touched.street &&
-                            guestFormik.errors.street
-                          }
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          {guestFormik.errors.street}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Thành phố *</Form.Label>
-                        <Form.Control
-                          name="city"
-                          {...guestFormik.getFieldProps("city")}
-                          isInvalid={
-                            guestFormik.touched.city &&
-                            guestFormik.errors.city
-                          }
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          {guestFormik.errors.city}
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
                   </Row>
+                  
+                  {/* GHN Address Selector for Guest */}
+                  <h6 className="mb-3 mt-2">Địa chỉ giao hàng</h6>
+                  <GHNAddressSelector
+                    onAddressChange={(address) => {
+                      setGuestGHNAddress(address);
+                      guestFormik.setFieldValue('street', address.street || '');
+                      guestFormik.setFieldValue('city', `${address.ward}, ${address.district}, ${address.province}` || '');
+                    }}
+                    onShippingFeeChange={(fee) => setShippingFee(fee)}
+                  />
                 </Form>
               )}
             </Card.Body>
@@ -619,22 +603,29 @@ export default function Checkout() {
               <FaTruck /> Đơn vị vận chuyển
             </Card.Header>
             <Card.Body>
-              {providers.map((p) => (
-                <Form.Check
-                  key={p.ProviderID}
-                  type="radio"
-                  name="provider"
-                  id={`provider-${p.ProviderID}`}
-                  label={`${p.Name} - ${(
-                    p.Fee || 0
-                  ).toLocaleString("vi-VN")}₫`}
-                  checked={shippingProviderId === p.ProviderID}
-                  onChange={() => {
-                    setShippingProviderId(p.ProviderID);
-                    setShippingFee(p.Fee || 0);
-                  }}
-                />
-              ))}
+              {isUser ? (
+                providers.map((p) => (
+                  <Form.Check
+                    key={p.ProviderID}
+                    type="radio"
+                    name="provider"
+                    id={`provider-${p.ProviderID}`}
+                    label={`${p.Name} - ${(
+                      p.Fee || 0
+                    ).toLocaleString("vi-VN")}₫`}
+                    checked={shippingProviderId === p.ProviderID}
+                    onChange={() => {
+                      setShippingProviderId(p.ProviderID);
+                      setShippingFee(p.Fee || 0);
+                    }}
+                  />
+                ))
+              ) : (
+                <div className="text-muted d-flex align-items-center">
+                  <FaTruck className="me-2" />
+                  Giao Hàng Nhanh (GHN) - {shippingFee.toLocaleString("vi-VN")}₫
+                </div>
+              )}
             </Card.Body>
           </Card>
 

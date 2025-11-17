@@ -6,6 +6,7 @@ const db = require('../models');
 const { Op, Sequelize } = require('sequelize');
 const OrderService = require('../services/order.service');
 const { createPaymentUrl } = require('../utils/vnpay.util');
+const ghnService = require('../services/ghn.service');
 
 // =======================================================
 // ===               CONTROLLERS CHO USER              ===
@@ -55,6 +56,14 @@ exports.placeOrder = async (req, res) => {
 
     // BƯỚC 1: Tạo đơn hàng & trừ tồn kho
     const newOrder = await OrderService.placeOrderTransaction(orderData, false);
+
+    // Tự động tạo GHN shipping order nếu đơn hàng confirmed (COD hoặc thanh toán thành công)
+    if (newOrder.Status === 'Confirmed' || newOrder.Status === 'Pending') {
+      // Chạy async không chặn luồng
+      OrderService.createGHNShippingOrder(newOrder, false).catch(err => {
+        console.error('Failed to create GHN shipping order:', err);
+      });
+    }
 
     // Đảm bảo đơn VNPAY luôn ở trạng thái "Chờ thanh toán"
     if (orderData.paymentMethod === 'VNPAY') {

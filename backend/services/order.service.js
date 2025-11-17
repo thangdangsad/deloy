@@ -198,7 +198,9 @@ exports.placeOrderTransaction = async (orderData, isGuest = false) => {
             newOrder = await db.GuestOrder.create(
                 {
                     ...commonOrderData,
-                    ...orderData.shipping
+                    ...orderData.shipping,
+                    WardCode: orderData.wardCode || null,
+                    DistrictID: orderData.districtId || null
                 },
                 { transaction: t }
             );
@@ -207,7 +209,9 @@ exports.placeOrderTransaction = async (orderData, isGuest = false) => {
                 {
                     ...commonOrderData,
                     UserID: userId,
-                    ShippingAddressID: orderData.shippingAddressId
+                    ShippingAddressID: orderData.shippingAddressId,
+                    WardCode: orderData.wardCode || null,
+                    DistrictID: orderData.districtId || null
                 },
                 { transaction: t }
             );
@@ -295,5 +299,126 @@ exports.placeOrderTransaction = async (orderData, isGuest = false) => {
     } catch (error) {
         await t.rollback();
         throw error;
+    }
+};
+
+/**
+ * Tạo đơn hàng GHN tự động
+ * @param {object} order - Order hoặc GuestOrder instance
+ * @param {boolean} isGuest - Có phải guest order không
+ * @returns {object} - GHN response với order_code
+ */
+exports.createGHNShippingOrder = async (order, isGuest = false) => {
+    try {
+        const ghnService = require('./ghn.service');
+        
+        // Skip nếu không có wardCode và districtId (địa chỉ không phải từ GHN)
+        if (!order.WardCode || !order.DistrictID) {
+            console.log('Skipping GHN order creation: Missing wardCode or districtId');
+            return null;
+        }
+        
+        console.log('=== GHN ORDER DEBUG ===');
+        console.log('WardCode:', order.WardCode);
+        console.log('DistrictID:', order.DistrictID);
+        console.log('Address:', order.Address || order.Street);
+        console.log('City:', order.City);
+        
+        // Reload order với associations để có getOrderItems/getGuestOrderItems methods
+        const fullOrder = isGuest
+            ? await db.GuestOrder.findByPk(order.GuestOrderID)
+            : await db.Order.findByPk(order.OrderID);
+        
+        if (!fullOrder) {
+            console.error('Order not found for GHN shipping');
+            return null;
+        }
+        
+        // Lấy items của đơn hàng trực tiếp từ DB
+        const ItemModel = isGuest ? db.GuestOrderItem : db.OrderItem;
+        const orderIdField = isGuest ? 'GuestOrderID' : 'OrderID';
+        
+        const items = await ItemModel.findAll({
+            where: { [orderIdField]: fullOrder[orderIdField] },
+            include: [{
+                model: db.ProductVariant,
+                as: 'variant',
+                include: [{
+                    model: db.Product,
+                    as: 'product'
+                }]
+            }]
+        });
+
+        // Parse địa chỉ từ City field (format: "Phường X, Quận Y, Tỉnh Z")
+        const cityParts = order.City ? order.City.split(',').map(s => s.trim()) : [];
+        const wardName = cityParts[0] || '';
+        const districtName = cityParts[1] || '';
+        const provinceName = cityParts[2] || '';
+
+        // Tính tổng khối lượng (mỗi đôi giày ~500g)
+        const totalWeight = items.reduce((sum, item) => sum + (item.Quantity * 500), 0);
+
+        const ghnOrderData = {
+            payment_type_id: fullOrder.PaymentMethod === 'COD' ? 2 : 1, // 1: Shop trả ship, 2: Người nhận trả
+            note: `Đơn hàng #${fullOrder.OrderID || fullOrder.GuestOrderID}`,
+            required_note: 'KHONGCHOXEMHANG',
+            client_order_code: `SHOE_${isGuest ? 'G' : ''}${fullOrder.OrderID || fullOrder.GuestOrderID}_${Date.now()}`,
+            // KHÔNG truyền from_* để GHN tự động lấy từ ShopID đã xác minh
+            to_name: fullOrder.FullName,
+            to_phone: fullOrder.Phone || fullOrder.PhoneNumber,
+            to_address: fullOrder.Address || fullOrder.Street,
+            to_ward_code: fullOrder.WardCode || '20308', // Default nếu không có
+            to_district_id: parseInt(fullOrder.DistrictID || 1490), // Default nếu không có
+            cod_amount: order.PaymentMethod === 'COD' ? order.TotalAmount : 0,
+            content: 'Giày dép thời trang',
+            weight: totalWeight,
+            length: 35,
+            width: 25,
+            height: 15,
+            insurance_value: Math.floor(order.TotalAmount),
+            service_type_id: 2,
+            items: items.map(item => ({
+                name: item.variant?.product?.Name || 'Giày',
+                code: item.variant?.SKU || '',
+                quantity: item.Quantity,
+                price: item.Price
+            }))
+        };
+
+        const ghnResponse = await ghnService.createShippingOrder(ghnOrderData);
+        
+        if (ghnResponse.code === 200 && ghnResponse.data) {
+            // Cập nhật TrackingCode vào đơn hàng
+            const ModelToUpdate = isGuest ? db.GuestOrder : db.Order;
+            const idField = isGuest ? 'GuestOrderID' : 'OrderID';
+            
+            await ModelToUpdate.update(
+                {
+                    TrackingCode: ghnResponse.data.order_code,
+                    ShippingProvider: 'GHN'
+                },
+                { where: { [idField]: fullOrder[idField] } }
+            );
+
+            return ghnResponse.data;
+        }
+
+        throw new Error('GHN không trả về order_code');
+    } catch (error) {
+        console.error('Create GHN Shipping Order Error:', error);
+        
+        // Nếu lỗi do địa chỉ Google Maps, trả về cảnh báo
+        if (error.message && error.message.includes('Address convert from fail')) {
+            console.warn('⚠️ Không thể tạo đơn GHN do lỗi xác minh địa chỉ từ Google Maps API.');
+            console.warn('⚠️ Đơn hàng đã được lưu thành công. Vui lòng tạo vận đơn thủ công trên GHN.');
+            return { 
+                warning: 'Đơn hàng đã được tạo nhưng chưa tạo được vận đơn GHN do lỗi xác minh địa chỉ.',
+                suggestion: 'Vui lòng tạo vận đơn thủ công trên trang GHN hoặc kiểm tra cấu hình địa chỉ gửi hàng.'
+            };
+        }
+        
+        // Không throw error để không làm fail toàn bộ order flow
+        return null;
     }
 };

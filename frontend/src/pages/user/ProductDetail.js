@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation, useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Row,
@@ -104,6 +104,7 @@ export default function ProductDetail() {
   const location = useLocation(); // 👉 dùng để redirect về sau login
   const dispatch = useDispatch();
   const carouselRef = useRef(null);
+  const { chatWidgetRef } = useOutletContext(); // 👉 Get chat widget ref from UserLayout
 
   const { data, reviews, reviewStats, relatedProducts, wishlist, status, error } =
     useSelector((state) => state.productDetail);
@@ -118,6 +119,17 @@ export default function ProductDetail() {
 
   // 👉 modal yêu cầu đăng nhập
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // 👉 Handler to open chat with product context
+  const handleChatNow = () => {
+    if (chatWidgetRef?.current && product) {
+      chatWidgetRef.current.openWithProduct(
+        product.Name,
+        `/product/${product.ProductID}`,
+        variants // Pass real variants data
+      );
+    }
+  };
 
   // Lấy data sản phẩm
   useEffect(() => {
@@ -480,7 +492,16 @@ export default function ProductDetail() {
             </Col>
           </Row>
 
-          <Card className="border-0">
+          {/* Chat ngay button */}
+          <Button
+            variant="outline-dark"
+            className="w-100 py-2 rounded-pill mt-2"
+            onClick={handleChatNow}
+          >
+            💬 Chat ngay - Tư vấn về sản phẩm này
+          </Button>
+
+          <Card className="border-0 mt-3">
             <Card.Header className="bg-white fw-bold">
               TẠI SAO CHỌN LILY SHOES?
             </Card.Header>

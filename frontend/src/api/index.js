@@ -90,6 +90,13 @@ export const deleteAddressAPI = (id) => api.delete(`/addresses/${id}`);
 export const setDefaultAddressAPI = (id) =>
     api.patch(`/addresses/${id}/default`);
 
+// --- GHN API ---
+export const getGHNProvincesAPI = () => api.get('/ghn/provinces');
+export const getGHNDistrictsAPI = (provinceId) => api.get(`/ghn/districts/${provinceId}`);
+export const getGHNWardsAPI = (districtId) => api.get(`/ghn/wards/${districtId}`);
+export const calculateGHNFeeAPI = (payload) => api.post('/ghn/calculate-fee', payload);
+export const getGHNServicesAPI = (payload) => api.post('/ghn/available-services', payload);
+
 // --- Profile & User Orders ---
 export const getProfileAPI = () => api.get('/profile');
 export const updateProfileAPI = (formData) =>

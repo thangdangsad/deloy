@@ -67,6 +67,13 @@ exports.placeGuestOrder = async (req, res) => {
         // BƯỚC 1: Tạo đơn hàng GuestOrder
         const newOrder = await OrderService.placeOrderTransaction(orderData, true);
 
+        // Tự động tạo GHN shipping order cho guest
+        if (newOrder.Status === 'Confirmed' || newOrder.Status === 'Pending') {
+            OrderService.createGHNShippingOrder(newOrder, true).catch(err => {
+                console.error('Failed to create GHN shipping order for guest:', err);
+            });
+        }
+
         // BƯỚC 2: Nếu là VNPAY → trả về link thanh toán
         if (orderData.paymentMethod === 'VNPAY') {
             const ipAddr =

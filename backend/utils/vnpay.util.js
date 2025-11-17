@@ -46,6 +46,13 @@ function createPaymentUrl(ipAddr, amount, orderId, returnUrl, orderInfo = 'Thanh
     const secretKey = process.env.VNPAY_HASH_SECRET;
     let vnpUrl = process.env.VNPAY_URL;
 
+    console.log('=== VNPAY DEBUG ===');
+    console.log('TmnCode:', tmnCode);
+    console.log('VnpUrl:', vnpUrl);
+    console.log('Amount:', amount);
+    console.log('OrderId:', orderId);
+    console.log('ReturnUrl:', returnUrl);
+
     const createDate = moment(new Date()).format('YYYYMMDDHHmmss');
 
     let vnp_Params = {};

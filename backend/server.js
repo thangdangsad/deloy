@@ -17,13 +17,13 @@ const axios = require("axios");
 // Nạp đối tượng db chứa sequelize instance và tất cả các model
 const db = require('./models');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 
 /* ---------------- CORS & Middlewares cơ bản ---------------- */
 const corsOptions = {
-  origin: true,
+  origin: 'http://localhost:3000',
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-ID'],
   exposedHeaders: ['X-Session-ID'],
@@ -157,6 +157,8 @@ const guestHistoryRouter = require('./routes/user/guestHistory');
 const passwordRouter = require('./routes/user/password');
 const wishlistUserRouter = require('./routes/user/wishlist');
 const paymentRoutes = require('./routes/payment.route');
+const ghnRouter = require('./routes/user/ghn');
+const chatRouter = require('./routes/chat.routes');
 // Admin routes
 const adminAuthRoutes = require("./routes/admin/authAdmin");
 const adminBlogsRouter = require("./routes/admin/blogsAdmin");
@@ -188,6 +190,8 @@ apiRouter.use('/guest-history', guestHistoryRouter);
 apiRouter.use('/guest-orders', guestOrdersRouter);
 apiRouter.use('/password', passwordRouter);
 apiRouter.use('/payment', paymentRoutes);
+apiRouter.use('/ghn', ghnRouter);
+apiRouter.use('/chat', chatRouter);
 // Authenticated User Routes
 const userAuthMiddleware = (req, res, next) => { if(req.auth) req.user = req.auth; next(); };
 apiRouter.use('/profile', authenticateUser, userAuthMiddleware, profileRouter);

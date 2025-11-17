@@ -110,6 +110,17 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         field: 'ShippingProvider'
       },
+      // Thông tin GHN
+      WardCode: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+        field: 'WardCode'
+      },
+      DistrictID: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: 'DistrictID'
+      },
       OrderDate: {
         type: DataTypes.DATE,
         allowNull: false,

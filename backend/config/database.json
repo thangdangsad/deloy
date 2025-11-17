@@ -30,7 +30,7 @@
         "encrypt": true,
         "trustServerCertificate": true
       }
-  }
+    }
   },
   "production": {
     "dialect": "mssql",
