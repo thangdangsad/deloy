@@ -1,7 +1,8 @@
 // Updated Node.js server with Socket.IO integration
 
 'use strict';
-
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
@@ -211,7 +212,13 @@ app.use((err, req, res, next) => {
     }
     res.status(500).send('Something broke!');
 });
+//swagger
 
+const swaggerFile = require('./swagger-output.json'); // đường dẫn tới file auto-gen
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+//----------------//
 const PORT = process.env.PORT || 5000;
 
 const server = http.createServer(app);
